@@ -6,7 +6,7 @@ import supabase from "../models/supabase.js";
 const router = Router();
 
 // Métodos (verbos) http
-router.get('api', (req, res) => {
+router.get('/api', (req, res) => {
     res.send('Welcome to Express-API ❤️');
 })
 
