@@ -57,5 +57,23 @@ router.post("/api/cows", async (req, res) => {
     }
 })
 
+// GET: Consultar Vaquitas en Supabase
+router.get("/api/cows", async (req, res) => {
+    const { data, error } = await supabase
+        .from('vacas')
+        .select('*')
+
+    if (data == null) {
+        res.status(404).json({
+            success: false,
+            message: "No se encontró información de las vacas",
+            error
+        });
+    } else {
+        res.status(200).send(data);
+    }
+})
+
+
 // Exportamos el router al index.js
 export default router;
