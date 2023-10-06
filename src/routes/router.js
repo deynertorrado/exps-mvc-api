@@ -35,7 +35,6 @@ router.post("/api/login", async (req, res) => {
 // POST: Crear nueva vaquita en Supabase
 router.post("/api/cows", async (req, res) => {
     const Name = req.body.cowName;
-    const Code = req.body.cowCode;
     const Breed = req.body.cowBreed;
     const Date = req.body.cowDate;
     const Weight = req.body.cowWeight;
@@ -43,7 +42,7 @@ router.post("/api/cows", async (req, res) => {
 
     const { data, error } = await supabase
         .from('vaquitas')
-        .insert({cowName: Name, cowCod: Code, cowBreed: Breed, cowDate: Date, cowWeight: Weight, cowBirths: Births})
+        .insert([{cowName: Name, cowBreed: Breed, cowDate: Date, cowWeight: Weight, cowBirths: Births}])
         .select()
 
     if (data == null) {
