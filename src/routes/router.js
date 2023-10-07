@@ -87,7 +87,7 @@ router.put("/api/cows", async (req, res) => {
     const { data, error } = await supabase
         .from('vacas')
         .update([{ cow_code: Code, cow_name: Name, cow_breed: Breed, cow_date: Date, cow_weight: Weight, cow_childs: Childs }])
-        .eq('id', cowID)
+        .eq('id', Id)
         .select()
 
     if (data == null) {
