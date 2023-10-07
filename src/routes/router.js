@@ -76,18 +76,18 @@ router.get("/api/cows", async (req, res) => {
 
 // PUT: Actualizar vaquita en Supabase
 router.put("/api/cows", async (req, res) => {
-    const Code = req.body.cow_code;
-    const Name = req.body.cow_name;
-    const Breed = req.body.cow_breed;
-    const Date = req.body.cow_date;
-    const Weight = req.body.cow_weight;
-    const Childs = req.body.cow_childs;
-    const Id = req.body.id;
+    const Code = req.body.cowCode;
+    const Name = req.body.cowName;
+    const Breed = req.body.cowbreed;
+    const Date = req.body.cowDate;
+    const Weight = req.body.cowWeight;
+    const Childs = req.body.cowChilds;
+    const Id = req.body.cowID;
     
     const { data, error } = await supabase
         .from('vacas')
         .update([{ cow_code: Code, cow_name: Name, cow_breed: Breed, cow_date: Date, cow_weight: Weight, cow_childs: Childs }])
-        .eq('id', Id)
+        .eq('id', cowID)
         .select()
 
     if (data == null) {
