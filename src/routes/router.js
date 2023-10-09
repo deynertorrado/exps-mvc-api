@@ -109,12 +109,11 @@ router.delete("/api/cows", async (req, res) => {
     const Date = req.body.cowDate;
     const Weight = req.body.cowWeight;
     const Childs = req.body.cowChilds;
-    const Id = req.body.cowID;
 
     const { error } = await supabase
-    .from('vacas')
-    .delete()
-    .eq('id', Id)
+        .from('vacas')
+        .delete()
+        .eq('cow_code', Code)
 
     res.status(204).send(error)
 })
