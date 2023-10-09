@@ -103,6 +103,12 @@ router.put("/api/cows", async (req, res) => {
 
 // DELETE: Eliminamos vaquitas en Supabase
 router.delete("/api/cows", async (req, res) => {
+    const Code = req.body.cowCode;
+    const Name = req.body.cowName;
+    const Breed = req.body.cowbreed;
+    const Date = req.body.cowDate;
+    const Weight = req.body.cowWeight;
+    const Childs = req.body.cowChilds;
     const Id = req.body.cowID;
 
     const { error } = await supabase
@@ -112,7 +118,7 @@ router.delete("/api/cows", async (req, res) => {
 
     res.status(204).send(error)
 })
-    
+
 
 // Exportamos el router al index.js
 export default router;
