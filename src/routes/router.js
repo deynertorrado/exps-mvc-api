@@ -10,28 +10,8 @@ router.get('/api', (req, res) => {
     res.send('Welcome to Express-API ❤️');
 })
 
-// POST: Verificar la existencia del usuario en Supabase
-router.post("/api/login", async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
 
-    const { data } = await supabase
-        .from("administradores")
-        .select("*")
-        .eq("username", username)
-        .eq("password", password);
-
-    if (data.length == 0) {
-        res.status(404).json({
-            success: false,
-            message: "Usuario no registrado",
-            error
-        });
-    } else {
-        res.status(200).send(data);
-    }
-});
-
+// ------------------------- Cow Routes --------------------------
 // POST: Crear nueva vaquita en Supabase
 router.post("/api/cows", async (req, res) => {
     const Code = req.body.cowCode;
@@ -113,6 +93,52 @@ router.delete("/api/cows/:delete", async (req, res) => {
     res.status(200).send(error)
 })
 
+
+// ------------------------- Cow Routes --------------------------
+// POST: Verificar la existencia del usuario en Supabase
+router.post("/api/login", async (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const { data } = await supabase
+        .from('perfiles')
+        .select("*")
+        .eq('username', username)
+        .eq('password', password);
+
+    if (data.length == 0) {
+        res.status(404).json({
+            success: false,
+            message: "Usuario no registrado",
+            error
+        });
+    } else {
+        res.status(200).send(data);
+    }
+});
+
+// POST: Crear nuevo usuario en Supabase
+router.post("/api/users", async (req, res) => {
+    const userName = req.body.userName;
+    const user = req.body.user;
+    const userPassword = req.body.userPassword;
+    const userType = req.body.userType;
+
+    const { data, error } = await supabase
+        .from('perfiles')
+        .insert([{ name: userName, username: user, password: userPassword, type: userType }])
+        .select()
+
+    if (data == null) {
+        res.status(404).json({
+            success: false,
+            message: "No se pudo agregar el nuevo usuario",
+            error
+        });
+    } else {
+        res.status(200).send(data);
+    }
+})
 
 // Exportamos el router al index.js
 export default router;
