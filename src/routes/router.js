@@ -94,7 +94,7 @@ router.delete("/api/cows/:delete", async (req, res) => {
 })
 
 
-// ------------------------- Cow Routes --------------------------
+// ------------------------- Users Routes --------------------------
 // POST: Verificar la existencia del usuario en Supabase
 router.post("/api/login", async (req, res) => {
     const username = req.body.username;
@@ -133,6 +133,23 @@ router.post("/api/users", async (req, res) => {
         res.status(404).json({
             success: false,
             message: "No se pudo agregar el nuevo usuario",
+            error
+        });
+    } else {
+        res.status(200).send(data);
+    }
+})
+
+// GET: Consultar usuarios en Supabase
+router.get("/api/users", async (req, res) => {
+    const { data, error } = await supabase
+        .from('perfiles')
+        .select('*')
+
+    if (data == null) {
+        res.status(404).json({
+            success: false,
+            message: "No se encontró información de los usuarios",
             error
         });
     } else {
