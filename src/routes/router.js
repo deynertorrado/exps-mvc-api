@@ -102,13 +102,13 @@ router.put("/api/cows", async (req, res) => {
 })
 
 // DELETE: Eliminamos vaquitas en Supabase
-router.delete("/api/cows", async (req, res) => {
-    const Code = req.body.cowCode;
+router.delete("/api/cows/:delete", async (req, res) => {
+    const Id = req.params.Id;
 
     const { error } = await supabase
         .from('vacas')
         .delete()
-        .eq('cow_code', Code)
+        .eq('id', Id)
 
     res.status(200).send(error)
 })
