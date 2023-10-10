@@ -182,6 +182,18 @@ router.put("/api/users", async (req, res) => {
     }
 })
 
+// DELETE: Eliminar usuario en Supabase
+router.delete("/api/users/:delete", async (req, res) => {
+    const id = req.params.delete;
+
+    const { error } = await supabase
+        .from('perfiles')
+        .delete()
+        .eq('id', id)
+
+    res.status(200).send(error)
+})
+
 
 // Exportamos el router al index.js
 export default router;
