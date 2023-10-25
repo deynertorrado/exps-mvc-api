@@ -222,5 +222,27 @@ router.get("/api/production", async (req, res) => {
     }
 })
 
+// POST: Crear nueva Producción de Leche en Supabase
+router.post("/api/production", async (req, res) => {
+    const cowID = req.body.cowID;
+    const monthID = req.body.monthID;
+    const productMilk = req.body.productMilk;
+
+    const { data, error } = await supabase
+        .from('produccion')
+        .insert([{ id_cow: cowID, id_month: monthID, production: productMilk }])
+        .select()
+
+    if (data == null) {
+        res.status(404).json({
+            success: false,
+            message: "No se pudo agregar la nueva Producción Lechera",
+            error
+        });
+    } else {
+        res.status(200).send(data);
+    }
+})
+
 // Exportamos el router al index.js
 export default router;
