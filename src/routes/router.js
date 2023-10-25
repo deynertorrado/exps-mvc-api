@@ -194,6 +194,33 @@ router.delete("/api/users/:delete", async (req, res) => {
     res.status(200).send(error)
 })
 
+// ------------------------- Production Routes --------------------------
+// GET: Consultar producción lechera en Supabase
+router.get("/api/production", async (req, res) => {
+    const { data, error } = await supabase
+        .from('produccion')
+        .select(`
+            *,
+            vacas(
+                id,
+                cow_name
+            ),
+            meses(
+                id,
+                month
+            )
+        `)
+
+    if (data == null) {
+        res.status(404).json({
+            success: false,
+            message: "No se encontró información de la producción lechera",
+            error
+        });
+    } else {
+        res.status(200).send(data);
+    }
+})
 
 // Exportamos el router al index.js
 export default router;
