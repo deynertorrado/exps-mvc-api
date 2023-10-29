@@ -1,5 +1,5 @@
 // Módulos de funcionamiento
-import {createClient} from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import dotenv from "dotenv";
 
 // Cargamos las variables de ambiente

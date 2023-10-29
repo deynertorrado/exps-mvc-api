@@ -4,6 +4,7 @@ import router from '../src/routes/router.js';
 import morgan from 'morgan'
 import bodyParser from "body-parser";
 import cors from "cors";
+import cookieParser from 'cookie-parser';
 
 // Código del servidor
 const app = express();
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000
 
 // Configuramos los middlewares 
 app.use(morgan('combined'));
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cors())

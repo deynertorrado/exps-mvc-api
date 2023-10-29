@@ -1,6 +1,7 @@
 // Módulos de funcionamiento
 import { Router } from "express";
 import supabase from "../models/supabase.js";
+import { createJWTToken, verifyJWT } from '../service/protocol.js'
 
 // Código del router
 const router = Router();
@@ -99,21 +100,28 @@ router.delete("/api/cows/:delete", async (req, res) => {
 router.post("/api/login", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-
     const { data } = await supabase
-        .from('perfiles')
+        .from('usuarios')
         .select("*")
         .eq('username', username)
         .eq('password', password);
 
-    if (data.length == 0) {
+    if (data == null) {
         res.status(404).json({
             success: false,
-            message: "Usuario no registrado",
-            error
+            message: "Usuario no registrado"
         });
     } else {
-        res.status(200).send(data);
+        // Obtenemos el nombre del usuario
+        const name = data[0].name;
+        // Creamos el JWT
+        const token = createJWTToken(username)
+        // Devuelve una respuesta
+        res.header("authorization", token).json({
+            message: "Acceso Autorizado",
+            name: name,
+            token: token
+        })
     }
 });
 
@@ -141,7 +149,7 @@ router.post("/api/users", async (req, res) => {
 })
 
 // GET: Consultar usuarios en Supabase
-router.get("/api/users", async (req, res) => {
+router.get("/api/users", verifyJWT, async (req, res) => {
     const { data, error } = await supabase
         .from('perfiles')
         .select('*')
@@ -149,8 +157,7 @@ router.get("/api/users", async (req, res) => {
     if (data == null) {
         res.status(404).json({
             success: false,
-            message: "No se encontró información de los usuarios",
-            error
+            message: "No se encontró información de los usuarios"
         });
     } else {
         res.status(200).send(data);
