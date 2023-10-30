@@ -100,20 +100,21 @@ router.delete("/api/cows/:delete", async (req, res) => {
 router.post("/api/login", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-    const { data } = await supabase
-        .from('usuarios')
-        .select("*")
-        .eq('username', username)
-        .eq('password', password);
 
-    if (data == null) {
+    let { data: usuarios, error } = await supabase
+    .from('usuarios')
+    .select('*')
+    .eq('username', username)
+    .eq('password', password)
+  
+    if (usuarios.length == 0 || usuarios == null) {
         res.status(404).json({
             success: false,
             message: "Usuario no registrado"
         });
     } else {
         // Obtenemos el nombre del usuario
-        const name = data[0].name;
+        const name = usuarios[0].name;
         // Creamos el JWT
         const token = createJWTToken(username)
         // Devuelve una respuesta
