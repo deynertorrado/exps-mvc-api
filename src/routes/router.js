@@ -39,10 +39,10 @@ router.post("/api/cows", async (req, res) => {
 })
 
 // GET: Consultar Vaquitas en Supabase
-router.get("/api/cows", async (req, res) => {
+router.get("/api/cows", verifyJWT, async (req, res) => {
     const { data, error } = await supabase
         .from('vacas')
-        .select('*')
+        .select('cow_code, cow_name, cow_breed, cow_date, cow_weight, cow_childs')
 
     if (data == null) {
         res.status(404).json({
@@ -107,7 +107,7 @@ router.post("/api/login", async (req, res) => {
     .eq('username', username)
     .eq('password', password)
   
-    if (usuarios.length == 0 || usuarios == null) {
+    if (usuarios == null) {
         res.status(404).json({
             success: false,
             message: "Usuario no registrado"
