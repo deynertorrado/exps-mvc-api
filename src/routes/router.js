@@ -14,7 +14,7 @@ router.get('/api', (req, res) => {
 
 // ------------------------- Cow Routes --------------------------
 // POST: Crear nueva vaquita en Supabase
-router.post("/api/cows", async (req, res) => {
+router.post("/api/cows", verifyJWT, async (req, res) => {
     const Code = req.body.cowCode;
     const Name = req.body.cowName;
     const Breed = req.body.cowBreed;
@@ -42,7 +42,7 @@ router.post("/api/cows", async (req, res) => {
 router.get("/api/cows", verifyJWT, async (req, res) => {
     const { data, error } = await supabase
         .from('vacas')
-        .select('cow_code, cow_name, cow_breed, cow_date, cow_weight, cow_childs')
+        .select('*')
 
     if (data == null) {
         res.status(404).json({
@@ -56,14 +56,15 @@ router.get("/api/cows", verifyJWT, async (req, res) => {
 })
 
 // PUT: Actualizar vaquita en Supabase
-router.put("/api/cows", async (req, res) => {
+router.put("/api/cows", verifyJWT, async (req, res) => {
     const Code = req.body.cowCode;
     const Name = req.body.cowName;
-    const Breed = req.body.cowbreed;
+    const Breed = req.body.cowBreed;
     const Date = req.body.cowDate;
     const Weight = req.body.cowWeight;
     const Childs = req.body.cowChilds;
     const Id = req.body.cowID;
+    console.log(Breed, Date)
     
     const { data, error } = await supabase
         .from('vacas')
@@ -83,7 +84,7 @@ router.put("/api/cows", async (req, res) => {
 })
 
 // DELETE: Eliminamos vaquitas en Supabase
-router.delete("/api/cows/:delete", async (req, res) => {
+router.delete("/api/cows/:delete", verifyJWT, async (req, res) => {
     const Id = req.params.delete;
 
     const { error } = await supabase
@@ -107,7 +108,7 @@ router.post("/api/login", async (req, res) => {
     .eq('username', username)
     .eq('password', password)
   
-    if (usuarios == null) {
+    if (usuarios == null || usuarios.length == 0) {
         res.status(404).json({
             success: false,
             message: "Usuario no registrado"
