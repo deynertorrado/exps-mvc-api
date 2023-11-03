@@ -116,12 +116,16 @@ router.post("/api/login", async (req, res) => {
     } else {
         // Obtenemos el nombre del usuario
         const name = usuarios[0].name;
+        const userName = usuarios[0].username;
+        const userType = usuarios[0].type
         // Creamos el JWT
         const token = createJWTToken(username)
         // Devuelve una respuesta
         res.header("authorization", token).json({
             message: "Acceso Autorizado",
             name: name,
+            userName: userName,
+            userType: userType,
             token: token
         })
     }
