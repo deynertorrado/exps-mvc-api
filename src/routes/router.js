@@ -132,14 +132,14 @@ router.post("/api/login", async (req, res) => {
 });
 
 // POST: Crear nuevo usuario en Supabase
-router.post("/api/users", async (req, res) => {
+router.post("/api/users", verifyJWT, async (req, res) => {
     const userName = req.body.userName;
     const user = req.body.user;
     const userPassword = req.body.userPassword;
     const userType = req.body.userType;
 
     const { data, error } = await supabase
-        .from('perfiles')
+        .from('usuarios')
         .insert([{ name: userName, username: user, password: userPassword, type: userType }])
         .select()
 
@@ -156,8 +156,8 @@ router.post("/api/users", async (req, res) => {
 
 // GET: Consultar usuarios en Supabase
 router.get("/api/users", verifyJWT, async (req, res) => {
-    const { data, error } = await supabase
-        .from('perfiles')
+    const { data } = await supabase
+        .from('usuarios')
         .select('*')
 
     if (data == null) {
@@ -170,8 +170,8 @@ router.get("/api/users", verifyJWT, async (req, res) => {
     }
 })
 
-// PUT: Crear nuevo usuario en Supabase
-router.put("/api/users", async (req, res) => {
+// PUT: Actualizar usuario en Supabase
+router.put("/api/users", verifyJWT, async (req, res) => {
     const userName = req.body.userName;
     const user = req.body.user;
     const userPassword = req.body.userPassword;
@@ -179,7 +179,7 @@ router.put("/api/users", async (req, res) => {
     const id = req.body.userId
 
     const { data, error } = await supabase
-        .from('perfiles')
+        .from('usuarios')
         .update([{ name: userName, username: user, password: userPassword, type: userType }])
         .eq('id', id)
         .select()
@@ -196,11 +196,11 @@ router.put("/api/users", async (req, res) => {
 })
 
 // DELETE: Eliminar usuario en Supabase
-router.delete("/api/users/:delete", async (req, res) => {
+router.delete("/api/users/:delete", verifyJWT, async (req, res) => {
     const id = req.params.delete;
 
     const { error } = await supabase
-        .from('perfiles')
+        .from('usuarios')
         .delete()
         .eq('id', id)
 
