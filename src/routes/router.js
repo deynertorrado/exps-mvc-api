@@ -209,7 +209,7 @@ router.delete("/api/users/:delete", verifyJWT, async (req, res) => {
 
 // ------------------------- Production Routes --------------------------
 // GET: Consultar producción lechera en Supabase
-router.get("/api/production", async (req, res) => {
+router.get("/api/production", verifyJWT, async (req, res) => {
     const { data, error } = await supabase
         .from('produccion')
         .select(`
@@ -217,10 +217,6 @@ router.get("/api/production", async (req, res) => {
             vacas(
                 id,
                 cow_name
-            ),
-            meses(
-                id,
-                month
             )
         `)
 
@@ -235,15 +231,15 @@ router.get("/api/production", async (req, res) => {
     }
 })
 
-// POST: Crear nueva Producción de Leche en Supabase
-router.post("/api/production", async (req, res) => {
-    const cowID = req.body.cowID;
-    const monthID = req.body.monthID;
-    const productMilk = req.body.productMilk;
+// POST: Agregar producción lechera a Supabase
+router.post("/api/production", verifyJWT, async (req, res) => {
+    const cowId = req.body.cowID;
+    const date = req.body.date;
+    const production = req.body.production;
 
     const { data, error } = await supabase
         .from('produccion')
-        .insert([{ id_cow: cowID, id_month: monthID, production: productMilk }])
+        .insert([{ id_cow: cowId, date: date, production: production }])
         .select()
 
     if (data == null) {
@@ -255,6 +251,42 @@ router.post("/api/production", async (req, res) => {
     } else {
         res.status(200).send(data);
     }
+})
+
+// PUT: Actualizar producción en Supabase
+router.put("/api/production", verifyJWT, async (req, res) => {
+    const cowId = req.body.cowID;
+    const date = req.body.date;
+    const production = req.body.production;
+    const id = req.body.productionId
+
+    const { data, error } = await supabase
+        .from('produccion')
+        .update([{ id_cow: cowId, date: date, production: production }])
+        .eq('id', id)
+        .select()
+
+    if (data == null) {
+        res.status(404).json({
+            success: false,
+            message: "Ocurrió un error al actualizar los datos",
+            error
+        });
+    } else {
+        res.status(200).send(data);
+    }
+})
+
+// DELETE: Eliminar producción en Supabase
+router.delete("/api/production/:delete", verifyJWT, async (req, res) => {
+    const id = req.params.delete;
+
+    const { error } = await supabase
+        .from('produccion')
+        .delete()
+        .eq('id', id)
+
+    res.status(200).send(error)
 })
 
 // Exportamos el router al index.js
