@@ -289,5 +289,70 @@ router.delete("/api/production/:delete", verifyJWT, async (req, res) => {
     res.status(200).send(error)
 })
 
+// GET: Consultar producción lechera para la gráfica en Supabase
+router.get("/api/production/graph", verifyJWT, async (req, res) => {
+    const { data, error } = await supabase
+        .from('produccion')
+        .select(`
+            *,
+            vacas(
+                id,
+                cow_name
+            )
+        `)
+
+    // const produccionesPorVaca = {};
+    // data.forEach((produccion) => {
+    //     const nombreVaca = produccion.vacas.cow_name;
+        
+    //     if (!produccionesPorVaca[nombreVaca]) {
+    //         produccionesPorVaca[nombreVaca] = [];
+    //     }
+        
+    //     produccionesPorVaca[nombreVaca].push({
+    //         id: produccion.id,
+    //         date: produccion.date,
+    //         production: produccion.production,
+    //     });
+    // });
+
+    const produccionesOrganizadas = {};
+
+    data.forEach((produccion) => {
+    const nombreVaca = produccion.vacas.cow_name;
+    const fecha = new Date(produccion.date);
+    const año = fecha.getFullYear();
+    const mes = fecha.getMonth() + 1; // Meses en JavaScript van de 0 a 11
+
+    if (!produccionesOrganizadas[nombreVaca]) {
+        produccionesOrganizadas[nombreVaca] = {};
+    }
+
+    if (!produccionesOrganizadas[nombreVaca][año]) {
+        produccionesOrganizadas[nombreVaca][año] = {};
+    }
+
+    if (!produccionesOrganizadas[nombreVaca][año][mes]) {
+        produccionesOrganizadas[nombreVaca][año][mes] = [];
+    }
+
+    produccionesOrganizadas[nombreVaca][año][mes].push({
+            id: produccion.id,
+            date: produccion.date,
+            production: produccion.production,
+        });
+    });
+
+    if (data == null) {
+        res.status(404).json({
+            success: false,
+            message: "No se encontró información de la producción lechera",
+            error
+        });
+    } else {
+        res.status(200).send(produccionesOrganizadas);
+    }
+})
+
 // Exportamos el router al index.js
 export default router;
