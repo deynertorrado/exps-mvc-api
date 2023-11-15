@@ -301,47 +301,65 @@ router.get("/api/production/graph", verifyJWT, async (req, res) => {
             )
         `)
 
-    // const produccionesPorVaca = {};
+    const produccionesPorVaca = {};
+    data.forEach((produccion) => {
+        const nombreVaca = produccion.vacas.cow_name;
+        
+        if (!produccionesPorVaca[nombreVaca]) {
+            produccionesPorVaca[nombreVaca] = [];
+        }
+        
+        produccionesPorVaca[nombreVaca].push({
+            id: produccion.id,
+            date: produccion.date,
+            production: produccion.production,
+        });
+    });
+
+    // const produccionesOrganizadas = {};
+
     // data.forEach((produccion) => {
-    //     const nombreVaca = produccion.vacas.cow_name;
-        
-    //     if (!produccionesPorVaca[nombreVaca]) {
-    //         produccionesPorVaca[nombreVaca] = [];
-    //     }
-        
-    //     produccionesPorVaca[nombreVaca].push({
+    // const nombreVaca = produccion.vacas.cow_name;
+    // const fecha = new Date(produccion.date);
+    // const año = fecha.getFullYear();
+    // const mes = fecha.getMonth() + 1; // Meses en JavaScript van de 0 a 11
+
+    // if (!produccionesOrganizadas[nombreVaca]) {
+    //     produccionesOrganizadas[nombreVaca] = {};
+    // }
+
+    // if (!produccionesOrganizadas[nombreVaca][año]) {
+    //     produccionesOrganizadas[nombreVaca][año] = {};
+    // }
+
+    // if (!produccionesOrganizadas[nombreVaca][año][mes]) {
+    //     produccionesOrganizadas[nombreVaca][año][mes] = [];
+    // }
+
+    // produccionesOrganizadas[nombreVaca][año][mes].push({
     //         id: produccion.id,
     //         date: produccion.date,
     //         production: produccion.production,
     //     });
     // });
 
-    const produccionesOrganizadas = {};
-
-    data.forEach((produccion) => {
-    const nombreVaca = produccion.vacas.cow_name;
-    const fecha = new Date(produccion.date);
-    const año = fecha.getFullYear();
-    const mes = fecha.getMonth() + 1; // Meses en JavaScript van de 0 a 11
-
-    if (!produccionesOrganizadas[nombreVaca]) {
-        produccionesOrganizadas[nombreVaca] = {};
-    }
-
-    if (!produccionesOrganizadas[nombreVaca][año]) {
-        produccionesOrganizadas[nombreVaca][año] = {};
-    }
-
-    if (!produccionesOrganizadas[nombreVaca][año][mes]) {
-        produccionesOrganizadas[nombreVaca][año][mes] = [];
-    }
-
-    produccionesOrganizadas[nombreVaca][año][mes].push({
-            id: produccion.id,
-            date: produccion.date,
-            production: produccion.production,
-        });
-    });
+    // const result = produccionesPorVaca.reduce((acc, curr) => {
+    //     const month = new Date(curr[0].date).getMonth();
+      
+    //     if (!acc[curr[0].name]) {
+    //       acc[curr[0].name] = {
+    //         month: month,
+    //         S1: 0,
+    //         S2: 0,
+    //         S3: 0,
+    //         S4: 0
+    //       };
+    //     }
+      
+    //     acc[curr[0].name][`S${month + 1}`] += curr[0].production;
+      
+    //     return acc;
+    //   }, {});
 
     if (data == null) {
         res.status(404).json({
@@ -350,7 +368,7 @@ router.get("/api/production/graph", verifyJWT, async (req, res) => {
             error
         });
     } else {
-        res.status(200).send(produccionesOrganizadas);
+        res.status(200).send(produccionesPorVaca);
     }
 })
 
