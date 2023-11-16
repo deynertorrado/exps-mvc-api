@@ -290,77 +290,41 @@ router.delete("/api/production/:delete", verifyJWT, async (req, res) => {
 })
 
 // GET: Consultar producción lechera para la gráfica en Supabase
-router.get("/api/production/graph", verifyJWT, async (req, res) => {
+router.get("/api/production/graph/:cowID", verifyJWT, async (req, res) => {
+    const id = req.params.cowID;
     const { data, error } = await supabase
         .from('produccion')
-        .select(`
-            *,
-            vacas(
-                id,
-                cow_name
-            )
-        `)
+        .select("*")
+        .eq('id_cow', id)
 
-    const produccionesPorVaca = {};
-    data.forEach((produccion) => {
-        const nombreVaca = produccion.vacas.cow_name;
-        
-        if (!produccionesPorVaca[nombreVaca]) {
-            produccionesPorVaca[nombreVaca] = [];
+    const newData = data.map(item => ({
+        date: item.date, // Manteniendo 'date' sin cambios
+        product: item.production // Renombrando 'production' a 'product'
+      }));
+
+    const organizedData = {};
+
+    newData.forEach(item => {
+        const dateParts = item.date.split('-');
+        const year = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]);
+
+        if (!organizedData[month]) {
+            organizedData[month] = { year, month, products: {} };
         }
-        
-        produccionesPorVaca[nombreVaca].push({
-            id: produccion.id,
-            date: produccion.date,
-            production: produccion.production,
-        });
+
+        const productKey = `P${Object.keys(organizedData[month].products).length + 1}`;
+        organizedData[month].products[productKey] = item.product;
     });
 
-    // const produccionesOrganizadas = {};
-
-    // data.forEach((produccion) => {
-    // const nombreVaca = produccion.vacas.cow_name;
-    // const fecha = new Date(produccion.date);
-    // const año = fecha.getFullYear();
-    // const mes = fecha.getMonth() + 1; // Meses en JavaScript van de 0 a 11
-
-    // if (!produccionesOrganizadas[nombreVaca]) {
-    //     produccionesOrganizadas[nombreVaca] = {};
-    // }
-
-    // if (!produccionesOrganizadas[nombreVaca][año]) {
-    //     produccionesOrganizadas[nombreVaca][año] = {};
-    // }
-
-    // if (!produccionesOrganizadas[nombreVaca][año][mes]) {
-    //     produccionesOrganizadas[nombreVaca][año][mes] = [];
-    // }
-
-    // produccionesOrganizadas[nombreVaca][año][mes].push({
-    //         id: produccion.id,
-    //         date: produccion.date,
-    //         production: produccion.production,
-    //     });
-    // });
-
-    // const result = produccionesPorVaca.reduce((acc, curr) => {
-    //     const month = new Date(curr[0].date).getMonth();
-      
-    //     if (!acc[curr[0].name]) {
-    //       acc[curr[0].name] = {
-    //         month: month,
-    //         S1: 0,
-    //         S2: 0,
-    //         S3: 0,
-    //         S4: 0
-    //       };
-    //     }
-      
-    //     acc[curr[0].name][`S${month + 1}`] += curr[0].production;
-      
-    //     return acc;
-    //   }, {});
-
+    // Convertir el objeto organizado a un array y ordenar las claves
+    const result = Object.values(organizedData).map(entry => {
+        entry.products = Object.fromEntries(
+            Object.entries(entry.products).sort((a, b) => parseInt(a[0].substring(1)) - parseInt(b[0].substring(1)))
+        );
+        return entry;
+    });
+  
     if (data == null) {
         res.status(404).json({
             success: false,
@@ -368,7 +332,7 @@ router.get("/api/production/graph", verifyJWT, async (req, res) => {
             error
         });
     } else {
-        res.status(200).send(produccionesPorVaca);
+        res.status(200).send(result);
     }
 })
 
